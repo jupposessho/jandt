@@ -16,7 +16,8 @@ lazy val connected = project
   .settings(commonSettings)
   .settings(
     name := "connected",
-    libraryDependencies ++= zio ++ http4s ++ circe :+ pureConfig :+ logback
+    resolvers += Resolver.sonatypeRepo("releases"),
+    libraryDependencies ++= zio ++ http4s ++ circe :+ pureConfig :+ logback :+ twitter
   )
 
 lazy val root = project
