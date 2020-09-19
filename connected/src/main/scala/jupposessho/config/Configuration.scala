@@ -12,10 +12,11 @@ object Configuration {
 
   implicit val zioDurationReader = ConfigReader[FiniteDuration].map(Duration.fromScala)
 
+  final case class TwitterConfig(retryCount: Int, duration: Duration)
   final case class GithubConfig(url: String, retryCount: Int, duration: Duration)
   final case class ServerConfig(host: String, port: Int)
 
-  final case class AppConfig(server: ServerConfig, github: GithubConfig)
+  final case class AppConfig(server: ServerConfig, github: GithubConfig, twitter: TwitterConfig)
 
   def load() =
     Task
