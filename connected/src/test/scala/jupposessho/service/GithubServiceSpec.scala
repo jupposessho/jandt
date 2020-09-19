@@ -48,18 +48,18 @@ object GithubServiceSpec extends DefaultRunnableSpec {
         assertFailure(
           Task.fail(UnexpectedStatus(NotFound)),
           Task.fail(UnexpectedStatus(NotFound)),
-          List(AppError.UserNotFound(sourceUser), AppError.UserNotFound(targetUser))
+          List(AppError.GithubUserNotFound(sourceUser), AppError.GithubUserNotFound(targetUser))
         )
       },
       testM("when source user is missing") {
         assertFailure(Task.fail(UnexpectedStatus(NotFound)),
                       Task.succeed(List(organization)),
-                      List(AppError.UserNotFound(sourceUser)))
+                      List(AppError.GithubUserNotFound(sourceUser)))
       },
       testM("when target user is missing") {
         assertFailure(Task.succeed(List(organization)),
                       Task.fail(UnexpectedStatus(NotFound)),
-                      List(AppError.UserNotFound(targetUser)))
+                      List(AppError.GithubUserNotFound(targetUser)))
       },
       testM("when both calls fail with other error") {
         assertFailure(
@@ -82,14 +82,14 @@ object GithubServiceSpec extends DefaultRunnableSpec {
         assertFailure(
           Task.fail(new Exception("source message")),
           Task.fail(UnexpectedStatus(NotFound)),
-          List(AppError.GithubError("source message"), AppError.UserNotFound(targetUser))
+          List(AppError.GithubError("source message"), AppError.GithubUserNotFound(targetUser))
         )
       },
       testM("when target call fails with other error and source user not found") {
         assertFailure(
           Task.fail(UnexpectedStatus(NotFound)),
           Task.fail(new Exception("target message")),
-          List(AppError.UserNotFound(sourceUser), AppError.GithubError("target message"))
+          List(AppError.GithubUserNotFound(sourceUser), AppError.GithubError("target message"))
         )
       },
       testM("when target call fails with other error and source fails with other UnexpectedStatus error") {

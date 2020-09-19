@@ -39,7 +39,7 @@ object GithubService {
       }
 
     private def convertError(error: Throwable, user: User): AppError = error match {
-      case UnexpectedStatus(NotFound) => AppError.UserNotFound(user)
+      case UnexpectedStatus(NotFound) => AppError.GithubUserNotFound(user)
       case _                          => AppError.GithubError(error.getMessage())
     }
   }

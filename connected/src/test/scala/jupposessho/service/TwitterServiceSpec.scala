@@ -44,7 +44,7 @@ object TwitterServiceSpec extends DefaultRunnableSpec {
           TwitterException(StatusCodes.NotFound, Errors(TwitterError("Could not determine source user.", 163)))
         )
         assertM(TwitterService(client).friends(sourceUser, targetUser).flip)(
-          equalTo(List(AppError.UserNotFound(sourceUser)))
+          equalTo(List(AppError.TwitterUserNotFound(sourceUser)))
         )
       },
       testM("when target does not exist") {
@@ -52,7 +52,7 @@ object TwitterServiceSpec extends DefaultRunnableSpec {
           TwitterException(StatusCodes.NotFound, Errors(TwitterError("User not found.", 50)))
         )
         assertM(TwitterService(client).friends(sourceUser, targetUser).flip)(
-          equalTo(List(AppError.UserNotFound(targetUser)))
+          equalTo(List(AppError.TwitterUserNotFound(targetUser)))
         )
       },
       testM("when other twitter error occurred") {

@@ -24,9 +24,9 @@ object TwitterService {
         .mapError { t =>
           t.errors.errors.toList.map { error =>
             if (error.code == 163) {
-              UserNotFound(source)
+              TwitterUserNotFound(source)
             } else if (error.code == 50) {
-              UserNotFound(target)
+              TwitterUserNotFound(target)
             } else {
               TwitterError(t.getMessage())
             }
