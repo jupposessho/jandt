@@ -15,9 +15,9 @@ object GithubServiceSpec extends DefaultRunnableSpec {
   val targetUser = User("target")
   val organization = Organization(1, "login", "url")
 
-  override def spec = suite("commonOrganizations should")(
+  override def spec = suite("GithubService.commonOrganizations should")(
     suite("return the common organizations")(
-      testM("when the given accounts are exists") {
+      testM("when the given accounts are exist") {
         val otherOrganization = Organization(2, "other", "url2")
         val sourceOrgs = List(
           Organization(3, "other", "url3"),
@@ -35,7 +35,7 @@ object GithubServiceSpec extends DefaultRunnableSpec {
           equalTo(List(organization, otherOrganization))
         )
       },
-      testM("when no common organization exists") {
+      testM("when there is no common organization") {
         val sourceOrgs = List(Organization(3, "other", "url3"))
         val targetOrgs = List(Organization(4, "other", "url4"))
         val client = TestGithubClient(Task.succeed(sourceOrgs), Task.succeed(targetOrgs))

@@ -13,7 +13,7 @@ object ConnectedServiceSpec extends DefaultRunnableSpec {
   val githubErrors = List(AppError.GithubError("github error"))
   val twitterErrors = List(AppError.TwitterError("twitter error"))
 
-  override def spec = suite("connected should")(
+  override def spec = suite("ConnectedService.connected should")(
     suite("return ConnectedResult")(
       testM("when the given accounts are connected") {
         val organization = Organization(1, "login", "url")

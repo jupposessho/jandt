@@ -1,8 +1,7 @@
 package jupposessho
 
 import jupposessho.config.Configuration
-import jupposessho.routes.ConnectedRoutes
-import jupposessho.service.Bootstrap._
+import jupposessho.service.Bootstrap
 import zio._
 import zio.stream.ZStream
 
@@ -13,9 +12,10 @@ object Main extends App {
     def program =
       for {
         config <- Configuration.load()
-        routes = ConnectedRoutes().routes()
+        restClient <- Bootstrap.client().toManaged_.flatten
+        routes = Bootstrap.routes(restClient, config)
         _ <- ZStream
-          .mergeAllUnbounded()(ZStream.fromEffect(server(config.server, routes)))
+          .mergeAllUnbounded()(ZStream.fromEffect(Bootstrap.server(config.server, routes)))
           .runDrain
           .toManaged_
       } yield ()
