@@ -6,6 +6,7 @@ import jupposessho.model.github.Organization
 import org.http4s.client.UnexpectedStatus
 import org.http4s.Status.NotFound
 import zio._
+import zio.logging.Logger
 
 object GithubService {
 
@@ -13,12 +14,19 @@ object GithubService {
     def commonOrganizations(source: User, target: User): IO[List[AppError], List[Organization]]
   }
 
-  def apply(client: GithubClient.Service) = new Service {
+  def apply(client: GithubClient.Service, log: Logger[String]) = new Service {
+
+    val logger = log.named("GithubService")
 
     def commonOrganizations(source: User, target: User): IO[List[AppError], List[Organization]] = {
-      (client.organizations(source).either).zipPar(client.organizations(target).either) flatMap {
-        handleResult(source, target)
-      }
+      (client
+        .organizations(source)
+        .either)
+        .zipPar(client.organizations(target).either)
+        .tap(githubResult => log.info(s"github result: $githubResult"))
+        .flatMap {
+          handleResult(source, target)
+        }
     }
 
     private def handleResult(source: User, target: User)(

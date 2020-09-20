@@ -11,9 +11,10 @@ import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.server.blaze.BlazeServerBuilder
 import scala.concurrent.ExecutionContext.Implicits
 import zio._
+import zio.clock.Clock
 import zio.interop.catz._
 import zio.interop.catz.implicits._
-import zio.clock.Clock
+import zio.logging.Logger
 
 object Bootstrap {
 
@@ -39,14 +40,14 @@ object Bootstrap {
           .toManaged
       }
 
-  def routes(restClient: Client[Task], config: AppConfig) = {
+  def routes(restClient: Client[Task], config: AppConfig, log: Logger[String]) = {
     val clock = Clock.Service.live
     val githubClient = GithubClient(restClient, clock, config.github)
-    val githubService = GithubService(githubClient)
+    val githubService = GithubService(githubClient, log)
     val twitterRestClient = TwitterRestClient(config.twitter.consumer, config.twitter.access)
     val twitterClient = TwitterClient(twitterRestClient, Clock.Service.live, config.twitter)
-    val twitterService = TwitterService(twitterClient)
-    val connectedService = ConnectedService(githubService, twitterService)
+    val twitterService = TwitterService(twitterClient, log)
+    val connectedService = ConnectedService(githubService, twitterService, log)
 
     ConnectedRoutes(connectedService).routes()
   }

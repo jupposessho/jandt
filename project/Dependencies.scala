@@ -14,6 +14,7 @@ object Dependencies {
     "dev.zio" %% "zio" % Versions.Zio,
     "dev.zio" %% "zio-macros" % Versions.Zio,
     "dev.zio" %% "zio-interop-cats" % "2.1.4.0",
+    "dev.zio" %% "zio-logging-slf4j" % "0.4.0",
     "dev.zio" %% "zio-test" % Versions.Zio % Test,
     "dev.zio" %% "zio-test-sbt" % Versions.Zio % Test
   )
