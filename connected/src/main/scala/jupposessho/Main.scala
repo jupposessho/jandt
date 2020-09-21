@@ -1,6 +1,7 @@
 package jupposessho
 
 import jupposessho.config.Configuration
+import jupposessho.model.github.Organization
 import jupposessho.service.Bootstrap
 import zio._
 import zio.logging.Logger
@@ -21,7 +22,8 @@ object Main extends App {
         config <- Configuration.load()
         log <- ZIO.environment[Has[Logger[String]]].map(_.get).toManaged_
         restClient <- Bootstrap.client().toManaged_.flatten
-        routes = Bootstrap.routes(restClient, config, log)
+        githubCache <- Ref.make(Map.empty[String, List[Organization]]).toManaged_
+        routes = Bootstrap.routes(restClient, config, log, githubCache)
         _ <- ZStream
           .mergeAllUnbounded()(ZStream.fromEffect(Bootstrap.server(config.server, routes)))
           .runDrain

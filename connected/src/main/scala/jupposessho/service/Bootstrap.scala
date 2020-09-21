@@ -1,15 +1,15 @@
 package jupposessho.service
 
 import com.danielasfregola.twitter4s.TwitterRestClient
-import jupposessho.config.Configuration.{AppConfig, ServerConfig}
 import jupposessho.client.{GithubClient, TwitterClient}
+import jupposessho.config.Configuration.{AppConfig, ServerConfig}
+import jupposessho.model.github.Organization
 import jupposessho.routes.ConnectedRoutes
 import jupposessho.service.{ConnectedService, GithubService, TwitterService}
 import org.http4s.HttpApp
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.server.blaze.BlazeServerBuilder
-import scala.concurrent.ExecutionContext.Implicits
 import zio._
 import zio.clock.Clock
 import zio.interop.catz._
@@ -35,14 +35,17 @@ object Bootstrap {
       .runtime[Any]
       .map { implicit rts =>
         BlazeClientBuilder
-          .apply[Task](Implicits.global)
+          .apply[Task](rts.platform.executor.asEC)
           .resource
           .toManaged
       }
 
-  def routes(restClient: Client[Task], config: AppConfig, log: Logger[String]) = {
+  def routes(restClient: Client[Task],
+             config: AppConfig,
+             log: Logger[String],
+             githubCache: Ref[Map[String, List[Organization]]]) = {
     val clock = Clock.Service.live
-    val githubClient = GithubClient(restClient, clock, config.github)
+    val githubClient = GithubClient(restClient, clock, config.github, log, githubCache)
     val githubService = GithubService(githubClient, log)
     val twitterRestClient = TwitterRestClient(config.twitter.consumer, config.twitter.access)
     val twitterClient = TwitterClient(twitterRestClient, Clock.Service.live, config.twitter)
