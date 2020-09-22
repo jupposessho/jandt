@@ -43,12 +43,13 @@ object Bootstrap {
   def routes(restClient: Client[Task],
              config: AppConfig,
              log: Logger[String],
-             githubCache: Ref[Map[String, List[Organization]]]) = {
+             githubCache: Ref[Map[String, List[Organization]]],
+             twitterCache: Ref[TwitterClient.Cache]) = {
     val clock = Clock.Service.live
     val githubClient = GithubClient(restClient, clock, config.github, log, githubCache)
     val githubService = GithubService(githubClient, log)
     val twitterRestClient = TwitterRestClient(config.twitter.consumer, config.twitter.access)
-    val twitterClient = TwitterClient(twitterRestClient, Clock.Service.live, config.twitter)
+    val twitterClient = TwitterClient(twitterRestClient, Clock.Service.live, config.twitter, log, twitterCache)
     val twitterService = TwitterService(twitterClient, log)
     val connectedService = ConnectedService(githubService, twitterService, log)
 

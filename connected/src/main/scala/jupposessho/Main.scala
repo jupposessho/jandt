@@ -1,6 +1,7 @@
 package jupposessho
 
 import jupposessho.config.Configuration
+import jupposessho.client.TwitterClient
 import jupposessho.model.github.Organization
 import jupposessho.service.Bootstrap
 import zio._
@@ -14,7 +15,7 @@ object Main extends App {
 
     val logger = Slf4jLogger.make(
       logFormat = (_, logEntry) => logEntry,
-      rootLoggerName = Some("SnapshotProcessorMain")
+      rootLoggerName = Some("ConnectedMain")
     )
 
     def program =
@@ -23,7 +24,8 @@ object Main extends App {
         log <- ZIO.environment[Has[Logger[String]]].map(_.get).toManaged_
         restClient <- Bootstrap.client().toManaged_.flatten
         githubCache <- Ref.make(Map.empty[String, List[Organization]]).toManaged_
-        routes = Bootstrap.routes(restClient, config, log, githubCache)
+        twitterCache <- Ref.make(TwitterClient.emptyCache).toManaged_
+        routes = Bootstrap.routes(restClient, config, log, githubCache, twitterCache)
         _ <- ZStream
           .mergeAllUnbounded()(ZStream.fromEffect(Bootstrap.server(config.server, routes)))
           .runDrain
